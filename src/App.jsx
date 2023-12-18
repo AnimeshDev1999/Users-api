@@ -5,11 +5,13 @@ import NavBar from "./components/NavBar";
 import UserPane from "./components/UserPane";
 import Expand from "./components/Expand";
 import BackBtn from "./components/BackBtn";
+import load from "./load.svg";
 
 function App() {
   // Declaraions
 
   const [active, setActive] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [list, setList] = useState(5);
   const [curUser, setCurUser] = useState("");
   const [userData, setUserData] = useState([]);
@@ -28,13 +30,21 @@ function App() {
   };
 
   // Data Fetching
+  const getApiData = async () => {
+    setLoading(true);
+    try {
+      const res = await axios.get(
+        "https://602e7c2c4410730017c50b9d.mockapi.io/users"
+      );
+      setUserData(res.data);
+    } catch (error) {
+      setErr(error.message);
+    }
+    setLoading(false);
+  };
+
   useEffect(() => {
-    axios
-      .get("https://602e7c2c4410730017c50b9d.mockapi.io/users")
-      .then((res) => setUserData(res.data))
-      .catch((error) => {
-        setErr(error.message);
-      });
+    getApiData();
   }, []);
 
   return (
@@ -45,6 +55,7 @@ function App() {
           <h1 className="text-3xl">{err}</h1>
         </div>
       )}
+      {loading ? <img src={load} className="loader" alt="loading" /> : ""}
       {active ? (
         <>
           <BackBtn func={switcher} />
